@@ -68,7 +68,7 @@ def signedIntFromBytes(x, endian="big"):
 
 class MPU6050(object):     
     def __init__(self, bus=None, freq=None, sda=None, scl=None, addr=_MPU6050_ADDRESS):
-        # Checks any erorr would happen with I2C communication protocol.
+        # Checks any error would happen with I2C communication protocol.
         self._failCount = 0
         self._terminatingFailCount = 0
         
@@ -238,7 +238,7 @@ class MPU6050(object):
         return {"x": x, "y": y, "z": z}
 
     def read_angle(self): # returns radians. orientation matches silkscreen
-        a=self.read_accel_data()
+        a = self.read_accel_data(g = True)
         x = atan2(a["y"],sqrt(a["z"]**2 + a["x"]**2))
         y = atan2(-a["x"],sqrt(a["z"]**2 + a["y"]**2))
         return {"x": x, "y": y}
