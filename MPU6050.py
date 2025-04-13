@@ -15,7 +15,7 @@ error_msg = "\nError \n"
 i2c_err_str = "ESP32 could not communicate with module at address 0x{:02X}, check wiring"
 
 # Global Variables
-_GRAVITIY_MS2 = 9.79473
+_GRAVITY_MS2 = 9.79473
 
 # Scale Modifiers
 _ACC_SCLR_2G = 16384.0
@@ -67,7 +67,7 @@ def signedIntFromBytes(x, endian="big"):
     
 
 class MPU6050(object):     
-    def __init__(self, bus=None, freq=None, sda=None, scl=None, addr=_MPU6050_ADDRESS):
+    def __init__(self, bus=None, freq=None, sda=None, scl=None, addr = _MPU6050_ADDRESS):
         # Checks any error would happen with I2C communication protocol.
         self._failCount = 0
         self._terminatingFailCount = 0
@@ -95,6 +95,7 @@ class MPU6050(object):
             raise e
         self._accel_range = self.get_accel_range(True)
         self._gyro_range = self.get_gyro_range(True)
+        self._gyro_calibration = {"x": 0, "y": 0, "z": 0}
 
     def _readData(self, register):
         failCount = 0
@@ -183,7 +184,7 @@ class MPU6050(object):
         elif accel_range == _ACC_RNG_16G:
             scaler = _ACC_SCLR_16G
         else:
-            print("Unkown range - scaler set to _ACC_SCLR_2G")
+            print("Unknown range - scaler set to _ACC_SCLR_2G")
             scaler = _ACC_SCLR_2G
 
         x = accel_data["x"] / scaler - 0.038
@@ -193,9 +194,9 @@ class MPU6050(object):
         if g is True:
             return {"x": x, "y": y, "z": z}
         elif g is False:
-            x = x * _GRAVITIY_MS2
-            y = y * _GRAVITIY_MS2
-            z = z * _GRAVITIY_MS2
+            x = x * _GRAVITY_MS2
+            y = y * _GRAVITY_MS2
+            z = z * _GRAVITY_MS2
             return {"x": x, "y": y, "z": z}
 
     def read_accel_abs(self, g = False):
@@ -250,12 +251,12 @@ class MPU6050(object):
         elif gyro_range == _GYR_RNG_2000DEG:
             scaler = _GYR_SCLR_2000DEG
         else:
-            print("Unkown range - scaler set to _GYR_SCLR_250DEG")
+            print("Unknown range - scaler set to _GYR_SCLR_250DEG")
             scaler = _GYR_SCLR_250DEG
 
-        x = gyro_data["x"] / scaler
-        y = gyro_data["y"] / scaler
-        z = gyro_data["z"] / scaler
+        x = gyro_data["x"] / scaler - self._gyro_calibration["x"]
+        y = gyro_data["y"] / scaler - self._gyro_calibration["y"]
+        z = gyro_data["z"] / scaler - self._gyro_calibration["z"]
 
         return {"x": x, "y": y, "z": z}
 
@@ -280,7 +281,7 @@ class MPU6050(object):
     def set_low_pass_filter(self, setting):
         """
         Turn on the Low pass filter of the MPU6050
-        :param setting: should be between 0 and 6
+        :param setting: should be between 0x00 and 0x06
         :return: none
         """
 
@@ -289,3 +290,23 @@ class MPU6050(object):
         else:
             self.i2c.writeto_mem(self.addr, _DLPF_CONFIG, bytes([0x00]))
             print("Invalid setting. Must be between 0 and 6, auto set to 0")
+
+    def gyro_calibration(self):
+        """
+        Calibrates the gyroscope values, should be run every time you start the program
+        :return:
+        """
+        x_cal , y_cal, z_cal = 0.0, 0.0, 0.0
+        for n in range(0, 2000):
+            gyro_data = self.read_gyro_data()
+            x_cal += gyro_data["x"]
+            y_cal += gyro_data["y"]
+            z_cal += gyro_data["z"]
+            n += 1
+            sleep_ms(1)
+
+        self._gyro_calibration["x"] = x_cal / 2000
+        self._gyro_calibration["y"] = y_cal / 2000
+        self._gyro_calibration["z"] = z_cal / 2000
+
+        print("Gyro calibration complete")

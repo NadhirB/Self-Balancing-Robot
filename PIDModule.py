@@ -9,7 +9,6 @@ class PID:
 
         self.last_error = 0.0
         self.integral = 0.0
-        self.last_time = None
 
     def compute_pid(self, desired_value, measured_value, dt):
         """
@@ -34,6 +33,5 @@ class PID:
         output = self.p_value * error + self.d_value * derivative + self.i_value * self.integral
 
         self.last_error = error
-        self.last_time = dt
 
         return output

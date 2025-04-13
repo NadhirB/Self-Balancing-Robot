@@ -19,11 +19,10 @@ class Motor:
 
     # speed value can be between 0 and 1
     def forward(self, speed):
-
+        print(f"forward")
         self.pin_pwm.duty(self.duty_cycle(speed))
         self.pin1.value(1)
         self.pin2.value(0)
-        print(f"forward {self.pin1.value()} {self.pin2.value()}")
     
     
     def backward(self, speed):
@@ -31,17 +30,13 @@ class Motor:
         self.pin_pwm.duty(self.duty_cycle(speed))
         self.pin1.value(0)
         self.pin2.value(1)
-    
-    
-    def stop(self):
 
+    def stop(self):
+        print(f"stop")
         self.pin_pwm.duty(0)
         self.pin1.value(0)
         self.pin2.value(0)
 
-        print(f"stop {self.pin1.value()} {self.pin2.value()}")
-    
-    
     def duty_cycle(self, speed):
         if speed <= 0 or speed > 1:
             duty_cycle = 0
