@@ -6,7 +6,9 @@ The project started as a way to improve my coding skills and learn new things, i
 
 ## Demo
 
-![Self-Balancing Robot Demo](Videos/demo.gif)
+<p align="center">
+  <img src="Videos/demo.gif" alt="Self-Balancing Robot Demo" width="30%">
+</p>
 
 ## Features
 - Real-time self-balancing
