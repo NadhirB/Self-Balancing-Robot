@@ -4,6 +4,10 @@
 A small yet powerful self-balancing robot project built using an ESP32 microcontroller and programmed in MicroPython. It uses real-time sensor data and PID control to maintain balance on two wheels.
 The project started as a way to improve my coding skills and learn new things, it was alot of fun and I'm hoping to do more projects like it.
 
+## Demo
+
+![Self-Balancing Robot Demo](Videos/demo.gif)
+
 ## Features
 - Real-time self-balancing
 - Lightweight MicroPython firmware
